@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="current_weather">Current weather</string>
     <string name="generic_api_error">There was a problem connecting to the Weather API. Check your data connection and try again.</string>
-    <string name="getting_your_location">Getting your location</string>
     <string name="temperature_title">Temperature:</string>
+    <string name="getting_location">Getting your location...</string>
+    <string name="getting_weather_info">Getting weather info...</string>
 </resources>

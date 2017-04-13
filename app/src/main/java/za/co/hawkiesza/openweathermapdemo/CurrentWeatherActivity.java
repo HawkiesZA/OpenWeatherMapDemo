@@ -185,11 +185,8 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
         currentTemperatureTextView.setText("");
         minTemperatureTextView.setText("");
         maxTemperatureTextView.setText("");
+        infoTextView.setText(R.string.getting_weather_info);
 
-        infoTextView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-        infoTextView.animate().alpha(1.0f);
-        progressBar.animate().alpha(1.0f);
         //TODO: hardcoded for now to see if this works
         if (currentLocation != null) {
             service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), API_KEY, "metric").enqueue(new Callback<WeatherResponse>() {
@@ -216,6 +213,11 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     }
 
     protected void startLocationUpdates() {
+        infoTextView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        infoTextView.animate().alpha(1.0f);
+        progressBar.animate().alpha(1.0f);
+        infoTextView.setText(R.string.getting_location);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
