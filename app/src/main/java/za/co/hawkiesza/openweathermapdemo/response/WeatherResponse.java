@@ -33,7 +33,8 @@ public class WeatherResponse
     @SerializedName("cod")
     private double cod;
 
-    public WeatherResponse(Coord coord, List<Weather> weatherList, String base, MainInfo main, Wind wind, Clouds clouds, Rain rain, Snow snow, long dateTime, Sys sys, int id, String cityName, double cod) {
+    public WeatherResponse(Coord coord, List<Weather> weatherList, String base, MainInfo main, Wind wind, Clouds clouds, Rain rain, Snow snow, long dateTime, Sys sys, int id, String cityName, double cod)
+    {
         this.coord = coord;
         this.weatherList = weatherList;
         this.base = base;
@@ -49,55 +50,68 @@ public class WeatherResponse
         this.cod = cod;
     }
 
-    public Coord getCoord() {
+    public Coord getCoord()
+    {
         return coord;
     }
 
-    public List<Weather> getWeatherList() {
+    public List<Weather> getWeatherList()
+    {
         return weatherList;
     }
 
-    public String getBase() {
+    public String getBase()
+    {
         return base;
     }
 
-    public MainInfo getMain() {
+    public MainInfo getMain()
+    {
         return main;
     }
 
-    public Wind getWind() {
+    public Wind getWind()
+    {
         return wind;
     }
 
-    public Clouds getClouds() {
+    public Clouds getClouds()
+    {
         return clouds;
     }
 
-    public Rain getRain() {
+    public Rain getRain()
+    {
         return rain;
     }
 
-    public Snow getSnow() {
+    public Snow getSnow()
+    {
         return snow;
     }
 
-    public long getDateTime() {
+    public long getDateTime()
+    {
         return dateTime;
     }
 
-    public Sys getSys() {
+    public Sys getSys()
+    {
         return sys;
     }
 
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 
-    public String getCityName() {
+    public String getCityName()
+    {
         return cityName;
     }
 
-    public double getCod() {
+    public double getCod()
+    {
         return cod;
     }
 }

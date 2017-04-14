@@ -9,16 +9,19 @@ public class Coord
     @SerializedName("lon")
     private double lon;
 
-    public Coord(double lat, double lon) {
+    public Coord(double lat, double lon)
+    {
         this.lat = lat;
         this.lon = lon;
     }
 
-    public double getLat() {
+    public double getLat()
+    {
         return lat;
     }
 
-    public double getLon() {
+    public double getLon()
+    {
         return lon;
     }
 }

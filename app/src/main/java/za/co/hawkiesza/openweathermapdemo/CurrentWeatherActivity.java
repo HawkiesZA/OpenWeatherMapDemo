@@ -37,8 +37,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
-public class CurrentWeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class CurrentWeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+{
     private static final String API_KEY = "";
+    private static final int REQUEST_CHECK_SETTINGS = 1;
+    private static final int REQUEST_ACCESS_FINE_LOCATION = 2;
+    private static final int REQUEST_ACCESS_COARSE_LOCATION = 3;
     private OpenWeatherMapService service;
     private TextView currentTemperatureTextView;
     private TextView minTemperatureTextView;
@@ -47,15 +51,12 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     private TextView infoTextView;
     private ProgressBar progressBar;
     private GoogleApiClient googleApiClient;
-
-    private static final int REQUEST_CHECK_SETTINGS = 1;
-    private static final int REQUEST_ACCESS_FINE_LOCATION = 2;
-    private static final int REQUEST_ACCESS_COARSE_LOCATION = 3;
     private Location currentLocation;
     private LocationRequest locationRequest;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_weather);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -63,15 +64,17 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 startLocationUpdates();
             }
         });
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.openweathermap.org/data/2.5/")
+                .baseUrl(getString(R.string.base_api_url))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -84,7 +87,8 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
         infoTextView = (TextView) findViewById(R.id.info_text_view);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
-        if (googleApiClient == null) {
+        if (googleApiClient == null)
+        {
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
@@ -97,36 +101,46 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
         checkLocationSettings();
     }
 
-    protected void onStart() {
-        googleApiClient.connect();
-        super.onStart();
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (googleApiClient.isConnected())
+        {
+            startLocationUpdates();
+        }
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
         stopLocationUpdates();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (googleApiClient.isConnected()) {
-            startLocationUpdates();
-        }
+    protected void onStart()
+    {
+        googleApiClient.connect();
+        super.onStart();
     }
 
-    protected void onStop() {
+    @Override
+    protected void onStop()
+    {
         googleApiClient.disconnect();
         super.onStop();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS: {
-                if (resultCode == RESULT_OK) {
-                    //we can try
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode)
+        {
+            case REQUEST_CHECK_SETTINGS:
+            {
+                if (resultCode == RESULT_OK)
+                {
                     startLocationUpdates();
                 }
                 break;
@@ -134,68 +148,80 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
         }
     }
 
-    protected void createLocationRequest() {
+    protected void createLocationRequest()
+    {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    private void checkLocationSettings() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
+    private void checkLocationSettings()
+    {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
 
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(googleApiClient,
-                        builder.build());
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
 
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>()
+        {
             @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult)
+            {
                 final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
+                switch (status.getStatusCode())
+                {
                     case LocationSettingsStatusCodes.SUCCESS:
+                    {
                         // All location settings are satisfied. The client can
                         // initialize location requests here.
                         break;
+                    }
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                    {
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        try {
+                        try
+                        {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    CurrentWeatherActivity.this,
-                                    REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
+                            status.startResolutionForResult(CurrentWeatherActivity.this, REQUEST_CHECK_SETTINGS);
+                        }
+                        catch (IntentSender.SendIntentException e)
+                        {
                             // Ignore the error.
                         }
                         break;
+                    }
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                    {
                         // Location settings are not satisfied. However, we have no way
                         // to fix the settings so we won't show the dialog.
                         break;
+                    }
                 }
             }
         });
     }
 
-    private void refresh() {
+    private void refresh()
+    {
         currentPlaceTextView.setText("");
         currentTemperatureTextView.setText("");
         minTemperatureTextView.setText("");
         maxTemperatureTextView.setText("");
         infoTextView.setText(R.string.getting_weather_info);
 
-        //TODO: hardcoded for now to see if this works
-        if (currentLocation != null) {
-            service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), API_KEY, "metric").enqueue(new Callback<WeatherResponse>() {
+        if (currentLocation != null)
+        {
+            service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), API_KEY, "metric").enqueue(new Callback<WeatherResponse>()
+            {
                 @Override
-                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response)
+                {
                     currentPlaceTextView.setText(response.body().getCityName());
-                    currentTemperatureTextView.setText("" + response.body().getMain().getTemp() + "\u2103");
-                    minTemperatureTextView.setText("" + response.body().getMain().getTempMin() + "\u2103");
-                    maxTemperatureTextView.setText("" + response.body().getMain().getTempMax() + "\u2103");
+                    currentTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTemp()));
+                    minTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTempMin()));
+                    maxTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTempMax()));
 
                     infoTextView.animate().alpha(0.0f);
                     progressBar.animate().alpha(0.0f);
@@ -205,53 +231,51 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
                 }
 
                 @Override
-                public void onFailure(Call<WeatherResponse> call, Throwable t) {
+                public void onFailure(Call<WeatherResponse> call, Throwable t)
+                {
                     Toast.makeText(CurrentWeatherActivity.this, R.string.generic_api_error, Toast.LENGTH_LONG).show();
                 }
             });
         }
     }
 
-    protected void startLocationUpdates() {
+    protected void startLocationUpdates()
+    {
         infoTextView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         infoTextView.animate().alpha(1.0f);
         progressBar.animate().alpha(1.0f);
         infoTextView.setText(R.string.getting_location);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_ACCESS_FINE_LOCATION);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ACCESS_FINE_LOCATION);
         }
-        else if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    REQUEST_ACCESS_COARSE_LOCATION);
+        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_COARSE_LOCATION);
         }
-        else {
+        else
+        {
             currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
     }
 
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                googleApiClient, this);
+    protected void stopLocationUpdates()
+    {
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults)
+    {
+        switch (requestCode)
+        {
             case REQUEST_ACCESS_FINE_LOCATION:
-            case REQUEST_ACCESS_COARSE_LOCATION:{
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case REQUEST_ACCESS_COARSE_LOCATION:
+            {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
 
                     startLocationUpdates();
                 }
@@ -261,23 +285,27 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onConnected(@Nullable Bundle bundle)
+    {
         startLocationUpdates();
         refresh();
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int i)
+    {
 
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
 
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         currentLocation = location;
         refresh();
     }

@@ -2,15 +2,18 @@ package za.co.hawkiesza.openweathermapdemo.response;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Clouds {
+public class Clouds
+{
     @SerializedName("all")
-    double cloudiness;
+    private double cloudiness;
 
-    public Clouds(double cloudiness) {
+    public Clouds(double cloudiness)
+    {
         this.cloudiness = cloudiness;
     }
 
-    public double getCloudiness() {
+    public double getCloudiness()
+    {
         return cloudiness;
     }
 }

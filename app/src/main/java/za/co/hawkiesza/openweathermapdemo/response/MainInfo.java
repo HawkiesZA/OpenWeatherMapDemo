@@ -19,7 +19,8 @@ public class MainInfo
     @SerializedName("grnd_level")
     private double groundLevel;
 
-    public MainInfo(double temp, double pressure, double humidity, double tempMin, double tempMax, double seaLevel, double groundLevel) {
+    public MainInfo(double temp, double pressure, double humidity, double tempMin, double tempMax, double seaLevel, double groundLevel)
+    {
         this.temp = temp;
         this.pressure = pressure;
         this.humidity = humidity;
@@ -29,31 +30,38 @@ public class MainInfo
         this.groundLevel = groundLevel;
     }
 
-    public double getTemp() {
+    public double getTemp()
+    {
         return temp;
     }
 
-    public double getPressure() {
+    public double getPressure()
+    {
         return pressure;
     }
 
-    public double getHumidity() {
+    public double getHumidity()
+    {
         return humidity;
     }
 
-    public double getTempMin() {
+    public double getTempMin()
+    {
         return tempMin;
     }
 
-    public double getTempMax() {
+    public double getTempMax()
+    {
         return tempMax;
     }
 
-    public double getSeaLevel() {
+    public double getSeaLevel()
+    {
         return seaLevel;
     }
 
-    public double getGroundLevel() {
+    public double getGroundLevel()
+    {
         return groundLevel;
     }
 }

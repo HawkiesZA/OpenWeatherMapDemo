@@ -2,21 +2,23 @@ package za.co.hawkiesza.openweathermapdemo.response;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Sys {
+public class Sys
+{
     @SerializedName("type")
-    double type;
+    private double type;
     @SerializedName("id")
-    double id;
+    private double id;
     @SerializedName("message")
-    double message;
+    private double message;
     @SerializedName("country")
-    String country;
+    private String country;
     @SerializedName("sunrise")
-    long sunriseTime;
+    private long sunriseTime;
     @SerializedName("sunset")
-    long sunsetTime;
+    private long sunsetTime;
 
-    public Sys(double type, double id, double message, String country, long sunriseTime, long sunsetTime) {
+    public Sys(double type, double id, double message, String country, long sunriseTime, long sunsetTime)
+    {
         this.type = type;
         this.id = id;
         this.message = message;
@@ -25,27 +27,33 @@ public class Sys {
         this.sunsetTime = sunsetTime;
     }
 
-    public double getType() {
+    public double getType()
+    {
         return type;
     }
 
-    public double getId() {
+    public double getId()
+    {
         return id;
     }
 
-    public double getMessage() {
+    public double getMessage()
+    {
         return message;
     }
 
-    public String getCountry() {
+    public String getCountry()
+    {
         return country;
     }
 
-    public long getSunriseTime() {
+    public long getSunriseTime()
+    {
         return sunriseTime;
     }
 
-    public long getSunsetTime() {
+    public long getSunsetTime()
+    {
         return sunsetTime;
     }
 }
