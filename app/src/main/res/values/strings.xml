@@ -7,5 +7,5 @@
     <string name="getting_location">Getting your location...</string>
     <string name="getting_weather_info">Getting weather info...</string>
     <string name="base_api_url">http://api.openweathermap.org/data/2.5/</string>
-    <string name="display_temperature">%1$d\u2103</string>
+    <string name="display_temperature">%1$.1f\u2103</string>
 </resources>
