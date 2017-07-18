@@ -39,7 +39,6 @@ import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
 public class CurrentWeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
-    private static final String API_KEY = "";
     private static final int REQUEST_CHECK_SETTINGS = 1;
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 3;
@@ -213,7 +212,7 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
 
         if (currentLocation != null)
         {
-            service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), API_KEY, "metric").enqueue(new Callback<WeatherResponse>()
+            service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), getString(R.string.API_KEY), "metric").enqueue(new Callback<WeatherResponse>()
             {
                 @Override
                 public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response)
