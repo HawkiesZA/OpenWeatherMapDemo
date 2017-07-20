@@ -1,6 +1,9 @@
-package za.co.hawkiesza.openweathermapdemo;
+package za.co.hawkiesza.openweathermapdemo.ui;
 
 import android.Manifest;
+import android.app.Activity;
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -11,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -21,7 +23,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -30,19 +31,19 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
+import javax.inject.Inject;
 
-public class CurrentWeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+import dagger.android.AndroidInjection;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+import za.co.hawkiesza.openweathermapdemo.R;
+import za.co.hawkiesza.openweathermapdemo.di.CurrentWeatherViewModelFactory;
+
+public class CurrentWeatherActivity extends LifecycleActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, HasActivityInjector
 {
     private static final int REQUEST_CHECK_SETTINGS = 1;
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 3;
-    private OpenWeatherMapService service;
     private TextView currentTemperatureTextView;
     private TextView minTemperatureTextView;
     private TextView maxTemperatureTextView;
@@ -52,32 +53,47 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private LocationRequest locationRequest;
+    private CurrentWeatherViewModel viewModel;
+
+    @Inject
+    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+
+    @Inject
+    CurrentWeatherViewModelFactory factory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
+
+        viewModel = ViewModelProviders.of(this, factory).get(CurrentWeatherViewModel.class);
+        viewModel.getWeather().observe(this, weatherResponse -> {
+            if (weatherResponse != null) {
+                currentPlaceTextView.setText(weatherResponse.getCityName());
+                currentTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTemp()));
+                minTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTempMin()));
+                maxTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTempMax()));
+
+                infoTextView.animate().alpha(0.0f);
+                progressBar.animate().alpha(0.0f);
+                infoTextView.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                Toast.makeText(CurrentWeatherActivity.this, R.string.generic_api_error, Toast.LENGTH_LONG).show();
+            }
+
+            stopLocationUpdates();
+        });
+
         setContentView(R.layout.activity_current_weather);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.current_weather);
-        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                startLocationUpdates();
-            }
-        });
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.base_api_url))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        service = retrofit.create(OpenWeatherMapService.class);
+        fab.setOnClickListener(view -> startLocationUpdates());
 
         currentTemperatureTextView = (TextView) findViewById(R.id.current_temperature);
         minTemperatureTextView = (TextView) findViewById(R.id.min_temperature);
@@ -101,27 +117,27 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     }
 
     @Override
+    protected void onStart()
+    {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
     public void onResume()
     {
-        super.onResume();
         if (googleApiClient.isConnected())
         {
             startLocationUpdates();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause()
     {
-        super.onPause();
         stopLocationUpdates();
-    }
-
-    @Override
-    protected void onStart()
-    {
-        googleApiClient.connect();
-        super.onStart();
+        super.onPause();
     }
 
     @Override
@@ -161,42 +177,37 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
 
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
 
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>()
-        {
-            @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult)
+        result.setResultCallback(locationSettingsResult -> {
+            final Status status = locationSettingsResult.getStatus();
+            switch (status.getStatusCode())
             {
-                final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode())
+                case LocationSettingsStatusCodes.SUCCESS:
                 {
-                    case LocationSettingsStatusCodes.SUCCESS:
+                    // All location settings are satisfied. The client can
+                    // initialize location requests here.
+                    break;
+                }
+                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try
                     {
-                        // All location settings are satisfied. The client can
-                        // initialize location requests here.
-                        break;
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        status.startResolutionForResult(CurrentWeatherActivity.this, REQUEST_CHECK_SETTINGS);
                     }
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                    catch (IntentSender.SendIntentException e)
                     {
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        try
-                        {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(CurrentWeatherActivity.this, REQUEST_CHECK_SETTINGS);
-                        }
-                        catch (IntentSender.SendIntentException e)
-                        {
-                            // Ignore the error.
-                        }
-                        break;
+                        // Ignore the error.
                     }
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                    {
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                    }
+                    break;
+                }
+                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                {
+                    // Location settings are not satisfied. However, we have no way
+                    // to fix the settings so we won't show the dialog.
+                    break;
                 }
             }
         });
@@ -212,29 +223,7 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
 
         if (currentLocation != null)
         {
-            service.getCurrentWeatherInfo(currentLocation.getLatitude(), currentLocation.getLongitude(), getString(R.string.API_KEY), "metric").enqueue(new Callback<WeatherResponse>()
-            {
-                @Override
-                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response)
-                {
-                    currentPlaceTextView.setText(response.body().getCityName());
-                    currentTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTemp()));
-                    minTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTempMin()));
-                    maxTemperatureTextView.setText(String.format(getString(R.string.display_temperature), response.body().getMain().getTempMax()));
-
-                    infoTextView.animate().alpha(0.0f);
-                    progressBar.animate().alpha(0.0f);
-                    infoTextView.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    stopLocationUpdates();
-                }
-
-                @Override
-                public void onFailure(Call<WeatherResponse> call, Throwable t)
-                {
-                    Toast.makeText(CurrentWeatherActivity.this, R.string.generic_api_error, Toast.LENGTH_LONG).show();
-                }
-            });
+            viewModel.setLocation(currentLocation);
         }
     }
 
@@ -262,7 +251,9 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
 
     protected void stopLocationUpdates()
     {
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        if (googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
     }
 
     @Override
@@ -307,5 +298,10 @@ public class CurrentWeatherActivity extends AppCompatActivity implements GoogleA
     {
         currentLocation = location;
         refresh();
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Activity> activityInjector() {
+        return dispatchingAndroidInjector;
     }
 }
