@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,27 +34,28 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import za.co.hawkiesza.openweathermapdemo.R;
+import za.co.hawkiesza.openweathermapdemo.databinding.ActivityCurrentWeatherBinding;
 import za.co.hawkiesza.openweathermapdemo.di.CurrentWeatherViewModelFactory;
+import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
 public class CurrentWeatherActivity extends LifecycleActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, HasActivityInjector
 {
     private static final int REQUEST_CHECK_SETTINGS = 1;
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 3;
-    private TextView currentTemperatureTextView;
-    private TextView minTemperatureTextView;
-    private TextView maxTemperatureTextView;
-    private TextView currentPlaceTextView;
-    private TextView infoTextView;
-    private ProgressBar progressBar;
+    @BindView(R.id.info_text_view) TextView infoTextView;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private LocationRequest locationRequest;
     private CurrentWeatherViewModel viewModel;
+    private ActivityCurrentWeatherBinding binding;
 
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
@@ -66,14 +68,13 @@ public class CurrentWeatherActivity extends LifecycleActivity implements GoogleA
     {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_current_weather, null, false);
+        setContentView(binding.getRoot());
 
         viewModel = ViewModelProviders.of(this, factory).get(CurrentWeatherViewModel.class);
-        viewModel.getWeather().observe(this, weatherResponse -> {
+        viewModel.getWeather().observe(this, (WeatherResponse weatherResponse) -> {
             if (weatherResponse != null) {
-                currentPlaceTextView.setText(weatherResponse.getCityName());
-                currentTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTemp()));
-                minTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTempMin()));
-                maxTemperatureTextView.setText(String.format(getString(R.string.display_temperature), weatherResponse.getMain().getTempMax()));
+                binding.setWeatherResponse(weatherResponse);
 
                 infoTextView.animate().alpha(0.0f);
                 progressBar.animate().alpha(0.0f);
@@ -88,19 +89,13 @@ public class CurrentWeatherActivity extends LifecycleActivity implements GoogleA
             stopLocationUpdates();
         });
 
-        setContentView(R.layout.activity_current_weather);
+        ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.current_weather);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view -> startLocationUpdates());
-
-        currentTemperatureTextView = (TextView) findViewById(R.id.current_temperature);
-        minTemperatureTextView = (TextView) findViewById(R.id.min_temperature);
-        maxTemperatureTextView = (TextView) findViewById(R.id.max_temperature);
-        currentPlaceTextView = (TextView) findViewById(R.id.place);
-        infoTextView = (TextView) findViewById(R.id.info_text_view);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         if (googleApiClient == null)
         {
@@ -215,10 +210,7 @@ public class CurrentWeatherActivity extends LifecycleActivity implements GoogleA
 
     private void refresh()
     {
-        currentPlaceTextView.setText("");
-        currentTemperatureTextView.setText("");
-        minTemperatureTextView.setText("");
-        maxTemperatureTextView.setText("");
+        binding.setWeatherResponse(null);
         infoTextView.setText(R.string.getting_weather_info);
 
         if (currentLocation != null)

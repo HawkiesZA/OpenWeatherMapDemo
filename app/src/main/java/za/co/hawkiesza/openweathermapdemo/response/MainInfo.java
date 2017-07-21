@@ -64,4 +64,32 @@ public class MainInfo
     {
         return groundLevel;
     }
+
+    public void setTemp(double temp) {
+        this.temp = temp;
+    }
+
+    public void setPressure(double pressure) {
+        this.pressure = pressure;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
+
+    public void setTempMin(double tempMin) {
+        this.tempMin = tempMin;
+    }
+
+    public void setTempMax(double tempMax) {
+        this.tempMax = tempMax;
+    }
+
+    public void setSeaLevel(double seaLevel) {
+        this.seaLevel = seaLevel;
+    }
+
+    public void setGroundLevel(double groundLevel) {
+        this.groundLevel = groundLevel;
+    }
 }

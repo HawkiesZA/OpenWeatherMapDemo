@@ -114,4 +114,56 @@ public class WeatherResponse
     {
         return cod;
     }
+
+    public void setCoord(Coord coord) {
+        this.coord = coord;
+    }
+
+    public void setWeatherList(List<Weather> weatherList) {
+        this.weatherList = weatherList;
+    }
+
+    public void setBase(String base) {
+        this.base = base;
+    }
+
+    public void setMain(MainInfo main) {
+        this.main = main;
+    }
+
+    public void setWind(Wind wind) {
+        this.wind = wind;
+    }
+
+    public void setClouds(Clouds clouds) {
+        this.clouds = clouds;
+    }
+
+    public void setRain(Rain rain) {
+        this.rain = rain;
+    }
+
+    public void setSnow(Snow snow) {
+        this.snow = snow;
+    }
+
+    public void setDateTime(long dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setSys(Sys sys) {
+        this.sys = sys;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public void setCod(double cod) {
+        this.cod = cod;
+    }
 }
