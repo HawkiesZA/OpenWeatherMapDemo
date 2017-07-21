@@ -5,6 +5,12 @@
     <data>
         <variable name="weatherResponse" type="za.co.hawkiesza.openweathermapdemo.response.WeatherResponse"/>
     </data>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="za.co.hawkiesza.openweathermapdemo.ui.CurrentWeatherActivity"
+        tools:showIn="@layout/activity_current_weather">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -12,16 +18,12 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp"
         android:layout_marginTop="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context="za.co.hawkiesza.openweathermapdemo.ui.CurrentWeatherActivity"
-            tools:showIn="@layout/activity_current_weather">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/place"
@@ -29,9 +31,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@{weatherResponse.cityName}"/>
+                android:text="@{weatherResponse.cityName}"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="8dp"/>
 
             <TextView
                 android:id="@+id/textView2"
@@ -103,7 +105,7 @@
                 android:layout_height="match_parent"
                 card_view:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="8dp">
-                <ImageView
+                <android.support.v7.widget.AppCompatImageView
                     android:id="@+id/imageView"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -133,5 +135,6 @@
         android:layout_below="@id/progress_bar"
         android:visibility="invisible"/>
     </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </layout>
