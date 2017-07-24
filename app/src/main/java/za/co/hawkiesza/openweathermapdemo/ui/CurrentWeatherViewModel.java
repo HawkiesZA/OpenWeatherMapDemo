@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import za.co.hawkiesza.openweathermapdemo.R;
 import za.co.hawkiesza.openweathermapdemo.WeatherRepository;
+import za.co.hawkiesza.openweathermapdemo.response.ForecastResponse;
 import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
 public class CurrentWeatherViewModel extends AndroidViewModel {
@@ -20,6 +21,7 @@ public class CurrentWeatherViewModel extends AndroidViewModel {
     private MutableLiveData<Location> location = new MutableLiveData<>();
     private WeatherRepository weatherRepo;
     private LiveData<WeatherResponse> weather;
+    private LiveData<ForecastResponse> forecast;
 
     @Inject
     public CurrentWeatherViewModel(Application application, WeatherRepository weatherRepository)
@@ -27,6 +29,7 @@ public class CurrentWeatherViewModel extends AndroidViewModel {
         super(application);
         this.weatherRepo = weatherRepository;
         this.weather = Transformations.switchMap(location, location -> weatherRepo.getWeather(this.getApplication().getString(R.string.API_KEY), location));
+        this.forecast = Transformations.switchMap(location, location -> weatherRepository.getForecast(this.getApplication().getString(R.string.API_KEY), location));
     }
 
     public void setLocation(Location location) {
@@ -38,5 +41,9 @@ public class CurrentWeatherViewModel extends AndroidViewModel {
 
     public LiveData<WeatherResponse> getWeather() {
         return weather;
+    }
+
+    public LiveData<ForecastResponse> getForecast() {
+        return forecast;
     }
 }

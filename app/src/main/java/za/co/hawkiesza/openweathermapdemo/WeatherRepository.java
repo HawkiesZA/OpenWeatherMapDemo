@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import za.co.hawkiesza.openweathermapdemo.response.ForecastResponse;
 import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
 public class WeatherRepository {
@@ -43,5 +44,29 @@ public class WeatherRepository {
         }
 
         return weatherData;
+    }
+
+    public LiveData<ForecastResponse> getForecast(String apiKey, Location currentLocation)
+    {
+        final MutableLiveData<ForecastResponse> forecastData = new MutableLiveData<>();
+        if (currentLocation != null)
+        {
+            service.getCurrentForecast(currentLocation.getLatitude(), currentLocation.getLongitude(), apiKey, "metric").enqueue(new Callback<ForecastResponse>()
+            {
+                @Override
+                public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response)
+                {
+                    forecastData.setValue(response.body());
+                }
+
+                @Override
+                public void onFailure(Call<ForecastResponse> call, Throwable t)
+                {
+                    //Toast.makeText(CurrentWeatherActivity.this, R.string.generic_api_error, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        return forecastData;
     }
 }

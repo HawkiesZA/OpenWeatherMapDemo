@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable name="weatherResponse" type="za.co.hawkiesza.openweathermapdemo.response.WeatherResponse"/>
+        <variable name="forecastResponse" type="za.co.hawkiesza.openweathermapdemo.response.ForecastResponse"/>
     </data>
 <android.support.design.widget.CoordinatorLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,7 +25,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_current_weather"
-        bind:weatherResponse="@{weatherResponse}"/>
+        bind:forecastResponse="@{forecastResponse}"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

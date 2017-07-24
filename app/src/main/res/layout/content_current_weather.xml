@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="weatherResponse" type="za.co.hawkiesza.openweathermapdemo.response.WeatherResponse"/>
+        <variable name="forecastResponse" type="za.co.hawkiesza.openweathermapdemo.response.ForecastResponse"/>
     </data>
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="@{weatherResponse.cityName}"
+                android:text="@{forecastResponse.city.name}"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="8dp"/>
 
@@ -79,7 +79,7 @@
                 android:layout_marginBottom="8dp"
                 app:layout_constraintLeft_toLeftOf="@+id/max_temperature"
                 app:layout_constraintBottom_toBottomOf="@+id/textView2"
-                android:text="@{String.format(@string/display_temperature, weatherResponse.main.temp)}"/>
+                android:text="@{String.format(@string/display_temperature, forecastResponse.forecastList[0].main.temp)}"/>
 
             <TextView
                 android:id="@+id/min_temperature"
@@ -89,7 +89,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginStart="0dp"
                 app:layout_constraintLeft_toLeftOf="@+id/max_temperature"
-                android:text="@{String.format(@string/display_temperature, weatherResponse.main.tempMin)}"/>
+                android:text="@{String.format(@string/display_temperature, forecastResponse.forecastList[0].main.tempMin)}"/>
             <TextView
                 android:id="@+id/max_temperature"
                 android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
                 android:layout_marginStart="0dp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView4"
                 android:layout_marginBottom="8dp"
-                android:text="@{String.format(@string/display_temperature, weatherResponse.main.tempMax)}"/>
+                android:text="@{String.format(@string/display_temperature, forecastResponse.forecastList[0].main.tempMax)}"/>
 
             <RelativeLayout
                 android:layout_width="wrap_content"

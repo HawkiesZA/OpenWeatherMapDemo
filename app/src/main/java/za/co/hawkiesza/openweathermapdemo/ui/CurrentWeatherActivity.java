@@ -42,6 +42,7 @@ import dagger.android.HasActivityInjector;
 import za.co.hawkiesza.openweathermapdemo.R;
 import za.co.hawkiesza.openweathermapdemo.databinding.ActivityCurrentWeatherBinding;
 import za.co.hawkiesza.openweathermapdemo.di.CurrentWeatherViewModelFactory;
+import za.co.hawkiesza.openweathermapdemo.response.ForecastResponse;
 import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 
 public class CurrentWeatherActivity extends LifecycleActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, HasActivityInjector
@@ -72,9 +73,9 @@ public class CurrentWeatherActivity extends LifecycleActivity implements GoogleA
         setContentView(binding.getRoot());
 
         viewModel = ViewModelProviders.of(this, factory).get(CurrentWeatherViewModel.class);
-        viewModel.getWeather().observe(this, (WeatherResponse weatherResponse) -> {
-            if (weatherResponse != null) {
-                binding.setWeatherResponse(weatherResponse);
+        viewModel.getForecast().observe(this, (ForecastResponse forecastResponse) -> {
+            if (forecastResponse != null) {
+                binding.setForecastResponse(forecastResponse);
 
                 infoTextView.animate().alpha(0.0f);
                 progressBar.animate().alpha(0.0f);
@@ -210,7 +211,7 @@ public class CurrentWeatherActivity extends LifecycleActivity implements GoogleA
 
     private void refresh()
     {
-        binding.setWeatherResponse(null);
+        binding.setForecastResponse(null);
         infoTextView.setText(R.string.getting_weather_info);
 
         if (currentLocation != null)
