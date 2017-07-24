@@ -4,6 +4,9 @@ package za.co.hawkiesza.openweathermapdemo;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.location.Location;
+import android.util.Log;
+
+import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
@@ -56,6 +59,7 @@ public class WeatherRepository {
                 @Override
                 public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response)
                 {
+                    Log.d("WeatherRepository", new Gson().toJson(response));
                     forecastData.setValue(response.body());
                 }
 

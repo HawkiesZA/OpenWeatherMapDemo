@@ -19,7 +19,6 @@ import za.co.hawkiesza.openweathermapdemo.response.WeatherResponse;
 public class CurrentWeatherViewModel extends AndroidViewModel {
 
     private MutableLiveData<Location> location = new MutableLiveData<>();
-    private WeatherRepository weatherRepo;
     private LiveData<WeatherResponse> weather;
     private LiveData<ForecastResponse> forecast;
 
@@ -27,8 +26,7 @@ public class CurrentWeatherViewModel extends AndroidViewModel {
     public CurrentWeatherViewModel(Application application, WeatherRepository weatherRepository)
     {
         super(application);
-        this.weatherRepo = weatherRepository;
-        this.weather = Transformations.switchMap(location, location -> weatherRepo.getWeather(this.getApplication().getString(R.string.API_KEY), location));
+        //this.weather = Transformations.switchMap(location, location -> weatherRepo.getWeather(this.getApplication().getString(R.string.API_KEY), location));
         this.forecast = Transformations.switchMap(location, location -> weatherRepository.getForecast(this.getApplication().getString(R.string.API_KEY), location));
     }
 
